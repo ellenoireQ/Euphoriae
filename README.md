@@ -39,7 +39,6 @@
 | Database | Room Persistence Library |
 | Image Loading | Coil |
 | Architecture | MVVM with StateFlow |
-| Typography | Plus Jakarta Sans |
 
 ## Getting Started
 
@@ -104,5 +103,6 @@ Contributions are welcome! Feel free to:
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
 
 ---
