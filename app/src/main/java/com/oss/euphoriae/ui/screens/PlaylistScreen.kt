@@ -83,15 +83,7 @@ fun PlaylistScreen(
                     .padding(innerPadding),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                
-                item {
-                    FavoritesCard(
-                        songCount = 0,
-                        onClick = { }
-                    )
-                }
-                
+            ) {    
                 item {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -157,49 +149,5 @@ fun PlaylistScreen(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun FavoritesCard(
-    songCount: Int,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    ElevatedCard(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = null,
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.error
-            )
-            
-            Column {
-                Text(
-                    text = "Favorites",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onErrorContainer
-                )
-                Text(
-                    text = "$songCount songs",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
-                )
-            }
-        }
     }
 }
