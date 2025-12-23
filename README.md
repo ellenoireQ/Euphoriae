@@ -42,6 +42,8 @@
   <img src="screenshoots/Screenshot_20251223-182639_Euphoriae.png" width="200" alt="Now Playing"/>
   <img src="screenshoots/Screenshot_20251223-182642_Euphoriae.png" width="200" alt="Now Playing 2"/>
   <img src="screenshoots/Screenshot_20251223-182644_Euphoriae.png" width="200" alt="Settings"/>
+  <img src="screenshoots/Screenshot_20251223-182714_Pixel Launcher.png" width="200" alt="Pixel Launcher"/>
+  <img src="screenshoots/Screenshot_20251223-182720_Pixel Launcher.png" width="200" alt="Pixel Launcher 2"/>
 </p>
 
 ## Tech Stack
