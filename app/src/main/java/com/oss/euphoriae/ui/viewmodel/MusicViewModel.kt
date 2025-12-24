@@ -127,11 +127,7 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
     private fun startService() {
         val app = getApplication<Application>()
         val intent = Intent(app, MusicPlaybackService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            app.startForegroundService(intent)
-        } else {
-            app.startService(intent)
-        }
+        app.startService(intent)
     }
     
     private fun loadSongs() {
