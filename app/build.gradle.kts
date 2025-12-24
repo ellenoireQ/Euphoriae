@@ -95,4 +95,7 @@ dependencies {
     // DataStore Preferences
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
+    // Material Color Utilities
+    implementation("com.google.android.material:material:1.11.0")
+
 }

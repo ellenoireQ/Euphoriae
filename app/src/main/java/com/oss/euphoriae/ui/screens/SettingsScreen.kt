@@ -33,12 +33,12 @@ data class ThemeColorItem(
 
 private val themeColors = listOf(
     ThemeColorItem(ThemeColorOption.DYNAMIC, Color.Transparent, isDynamic = true),
-    ThemeColorItem(ThemeColorOption.PURPLE, Purple40),
-    ThemeColorItem(ThemeColorOption.BLUE, Blue40),
-    ThemeColorItem(ThemeColorOption.GREEN, Green40),
-    ThemeColorItem(ThemeColorOption.ORANGE, Orange40),
-    ThemeColorItem(ThemeColorOption.PINK, PinkBright40),
-    ThemeColorItem(ThemeColorOption.RED, Red40)
+    ThemeColorItem(ThemeColorOption.PURPLE, SeedPurple),
+    ThemeColorItem(ThemeColorOption.BLUE, SeedBlue),
+    ThemeColorItem(ThemeColorOption.GREEN, SeedGreen),
+    ThemeColorItem(ThemeColorOption.ORANGE, SeedOrange),
+    ThemeColorItem(ThemeColorOption.PINK, SeedPink),
+    ThemeColorItem(ThemeColorOption.RED, SeedRed)
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

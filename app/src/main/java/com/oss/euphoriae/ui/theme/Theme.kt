@@ -2,6 +2,7 @@ package com.oss.euphoriae.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -10,196 +11,126 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.google.android.material.color.utilities.Hct
+import com.google.android.material.color.utilities.MaterialDynamicColors
+import com.google.android.material.color.utilities.SchemeContent
+import com.google.android.material.color.utilities.SchemeTonalSpot
 import com.oss.euphoriae.data.preferences.ThemeColorOption
 
-// Purple Color Schemes
-private val PurpleDarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    onPrimary = Color(0xFF381E72),
-    primaryContainer = Color(0xFF4F378B),
-    onPrimaryContainer = Color(0xFFEADDFF),
-    secondary = PurpleGrey80,
-    onSecondary = Color(0xFF332D41),
-    secondaryContainer = Color(0xFF4A4458),
-    onSecondaryContainer = Color(0xFFE8DEF8),
-    tertiary = Pink80,
-    onTertiary = Color(0xFF492532),
-    tertiaryContainer = Color(0xFF633B48),
-    onTertiaryContainer = Color(0xFFFFD8E4),
-    surface = Color(0xFF1C1B1F),
-    onSurface = Color(0xFFE6E1E5),
-    surfaceVariant = Color(0xFF49454F),
-    onSurfaceVariant = Color(0xFFCAC4D0)
-)
+// Seed colors for each theme
+private const val SEED_PURPLE = 0xFF6750A4.toInt()
+private const val SEED_BLUE = 0xFF0061A4.toInt()
+private const val SEED_GREEN = 0xFF386A20.toInt()
+private const val SEED_ORANGE = 0xFF8B5000.toInt()
+private const val SEED_PINK = 0xFFBC004B.toInt()
+private const val SEED_RED = 0xFFBA1A1A.toInt()
 
-private val PurpleLightColorScheme = lightColorScheme(
-    primary = Purple40,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFEADDFF),
-    onPrimaryContainer = Color(0xFF21005D),
-    secondary = PurpleGrey40,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE8DEF8),
-    onSecondaryContainer = Color(0xFF1D192B),
-    tertiary = Pink40,
-    surface = Color(0xFFFFFBFE),
-    onSurface = Color(0xFF1C1B1F)
-)
+/**
+ * Generate a complete Material 3 ColorScheme from a seed color using Material Color Utilities
+ */
+private fun generateColorScheme(seedColor: Int, isDark: Boolean): ColorScheme {
+    val scheme = SchemeTonalSpot(
+        Hct.fromInt(seedColor),
+        isDark,
+        0.0 // contrast level
+    )
+    
+    val dynamicColors = MaterialDynamicColors()
+    
+    return if (isDark) {
+        darkColorScheme(
+            primary = Color(dynamicColors.primary().getArgb(scheme)),
+            onPrimary = Color(dynamicColors.onPrimary().getArgb(scheme)),
+            primaryContainer = Color(dynamicColors.primaryContainer().getArgb(scheme)),
+            onPrimaryContainer = Color(dynamicColors.onPrimaryContainer().getArgb(scheme)),
+            inversePrimary = Color(dynamicColors.inversePrimary().getArgb(scheme)),
+            secondary = Color(dynamicColors.secondary().getArgb(scheme)),
+            onSecondary = Color(dynamicColors.onSecondary().getArgb(scheme)),
+            secondaryContainer = Color(dynamicColors.secondaryContainer().getArgb(scheme)),
+            onSecondaryContainer = Color(dynamicColors.onSecondaryContainer().getArgb(scheme)),
+            tertiary = Color(dynamicColors.tertiary().getArgb(scheme)),
+            onTertiary = Color(dynamicColors.onTertiary().getArgb(scheme)),
+            tertiaryContainer = Color(dynamicColors.tertiaryContainer().getArgb(scheme)),
+            onTertiaryContainer = Color(dynamicColors.onTertiaryContainer().getArgb(scheme)),
+            background = Color(dynamicColors.background().getArgb(scheme)),
+            onBackground = Color(dynamicColors.onBackground().getArgb(scheme)),
+            surface = Color(dynamicColors.surface().getArgb(scheme)),
+            onSurface = Color(dynamicColors.onSurface().getArgb(scheme)),
+            surfaceVariant = Color(dynamicColors.surfaceVariant().getArgb(scheme)),
+            onSurfaceVariant = Color(dynamicColors.onSurfaceVariant().getArgb(scheme)),
+            surfaceTint = Color(dynamicColors.primary().getArgb(scheme)),
+            inverseSurface = Color(dynamicColors.inverseSurface().getArgb(scheme)),
+            inverseOnSurface = Color(dynamicColors.inverseOnSurface().getArgb(scheme)),
+            error = Color(dynamicColors.error().getArgb(scheme)),
+            onError = Color(dynamicColors.onError().getArgb(scheme)),
+            errorContainer = Color(dynamicColors.errorContainer().getArgb(scheme)),
+            onErrorContainer = Color(dynamicColors.onErrorContainer().getArgb(scheme)),
+            outline = Color(dynamicColors.outline().getArgb(scheme)),
+            outlineVariant = Color(dynamicColors.outlineVariant().getArgb(scheme)),
+            scrim = Color(0xFF000000),
+            surfaceBright = Color(dynamicColors.surfaceBright().getArgb(scheme)),
+            surfaceContainer = Color(dynamicColors.surfaceContainer().getArgb(scheme)),
+            surfaceContainerHigh = Color(dynamicColors.surfaceContainerHigh().getArgb(scheme)),
+            surfaceContainerHighest = Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
+            surfaceContainerLow = Color(dynamicColors.surfaceContainerLow().getArgb(scheme)),
+            surfaceContainerLowest = Color(dynamicColors.surfaceContainerLowest().getArgb(scheme)),
+            surfaceDim = Color(dynamicColors.surfaceDim().getArgb(scheme))
+        )
+    } else {
+        lightColorScheme(
+            primary = Color(dynamicColors.primary().getArgb(scheme)),
+            onPrimary = Color(dynamicColors.onPrimary().getArgb(scheme)),
+            primaryContainer = Color(dynamicColors.primaryContainer().getArgb(scheme)),
+            onPrimaryContainer = Color(dynamicColors.onPrimaryContainer().getArgb(scheme)),
+            inversePrimary = Color(dynamicColors.inversePrimary().getArgb(scheme)),
+            secondary = Color(dynamicColors.secondary().getArgb(scheme)),
+            onSecondary = Color(dynamicColors.onSecondary().getArgb(scheme)),
+            secondaryContainer = Color(dynamicColors.secondaryContainer().getArgb(scheme)),
+            onSecondaryContainer = Color(dynamicColors.onSecondaryContainer().getArgb(scheme)),
+            tertiary = Color(dynamicColors.tertiary().getArgb(scheme)),
+            onTertiary = Color(dynamicColors.onTertiary().getArgb(scheme)),
+            tertiaryContainer = Color(dynamicColors.tertiaryContainer().getArgb(scheme)),
+            onTertiaryContainer = Color(dynamicColors.onTertiaryContainer().getArgb(scheme)),
+            background = Color(dynamicColors.background().getArgb(scheme)),
+            onBackground = Color(dynamicColors.onBackground().getArgb(scheme)),
+            surface = Color(dynamicColors.surface().getArgb(scheme)),
+            onSurface = Color(dynamicColors.onSurface().getArgb(scheme)),
+            surfaceVariant = Color(dynamicColors.surfaceVariant().getArgb(scheme)),
+            onSurfaceVariant = Color(dynamicColors.onSurfaceVariant().getArgb(scheme)),
+            surfaceTint = Color(dynamicColors.primary().getArgb(scheme)),
+            inverseSurface = Color(dynamicColors.inverseSurface().getArgb(scheme)),
+            inverseOnSurface = Color(dynamicColors.inverseOnSurface().getArgb(scheme)),
+            error = Color(dynamicColors.error().getArgb(scheme)),
+            onError = Color(dynamicColors.onError().getArgb(scheme)),
+            errorContainer = Color(dynamicColors.errorContainer().getArgb(scheme)),
+            onErrorContainer = Color(dynamicColors.onErrorContainer().getArgb(scheme)),
+            outline = Color(dynamicColors.outline().getArgb(scheme)),
+            outlineVariant = Color(dynamicColors.outlineVariant().getArgb(scheme)),
+            scrim = Color(0xFF000000),
+            surfaceBright = Color(dynamicColors.surfaceBright().getArgb(scheme)),
+            surfaceContainer = Color(dynamicColors.surfaceContainer().getArgb(scheme)),
+            surfaceContainerHigh = Color(dynamicColors.surfaceContainerHigh().getArgb(scheme)),
+            surfaceContainerHighest = Color(dynamicColors.surfaceContainerHighest().getArgb(scheme)),
+            surfaceContainerLow = Color(dynamicColors.surfaceContainerLow().getArgb(scheme)),
+            surfaceContainerLowest = Color(dynamicColors.surfaceContainerLowest().getArgb(scheme)),
+            surfaceDim = Color(dynamicColors.surfaceDim().getArgb(scheme))
+        )
+    }
+}
 
-// Blue Color Schemes
-private val BlueDarkColorScheme = darkColorScheme(
-    primary = Blue80,
-    onPrimary = Color(0xFF003258),
-    primaryContainer = Color(0xFF004880),
-    onPrimaryContainer = Color(0xFFD1E4FF),
-    secondary = BlueGrey80,
-    onSecondary = Color(0xFF263238),
-    secondaryContainer = Color(0xFF37474F),
-    onSecondaryContainer = Color(0xFFCFD8DC),
-    tertiary = BlueAccent80,
-    surface = Color(0xFF1A1C1E),
-    onSurface = Color(0xFFE3E2E6),
-    surfaceVariant = Color(0xFF43474E),
-    onSurfaceVariant = Color(0xFFC3C7CF)
-)
-
-private val BlueLightColorScheme = lightColorScheme(
-    primary = Blue40,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFD1E4FF),
-    onPrimaryContainer = Color(0xFF001D36),
-    secondary = BlueGrey40,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFCFD8DC),
-    onSecondaryContainer = Color(0xFF102027),
-    tertiary = BlueAccent40,
-    surface = Color(0xFFFDFCFF),
-    onSurface = Color(0xFF1A1C1E)
-)
-
-// Green Color Schemes
-private val GreenDarkColorScheme = darkColorScheme(
-    primary = Green80,
-    onPrimary = Color(0xFF003910),
-    primaryContainer = Color(0xFF005319),
-    onPrimaryContainer = Color(0xFFA7F5A0),
-    secondary = GreenGrey80,
-    onSecondary = Color(0xFF1B3820),
-    secondaryContainer = Color(0xFF324F36),
-    onSecondaryContainer = Color(0xFFBEEBBE),
-    tertiary = GreenAccent80,
-    surface = Color(0xFF1A1C19),
-    onSurface = Color(0xFFE2E3DD),
-    surfaceVariant = Color(0xFF424940),
-    onSurfaceVariant = Color(0xFFC2C9BD)
-)
-
-private val GreenLightColorScheme = lightColorScheme(
-    primary = Green40,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFA7F5A0),
-    onPrimaryContainer = Color(0xFF002105),
-    secondary = GreenGrey40,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFBEEBBE),
-    onSecondaryContainer = Color(0xFF05210A),
-    tertiary = GreenAccent40,
-    surface = Color(0xFFFCFDF7),
-    onSurface = Color(0xFF1A1C19)
-)
-
-// Orange Color Schemes
-private val OrangeDarkColorScheme = darkColorScheme(
-    primary = Orange80,
-    onPrimary = Color(0xFF4E2600),
-    primaryContainer = Color(0xFF6F3800),
-    onPrimaryContainer = Color(0xFFFFDCC2),
-    secondary = OrangeGrey80,
-    onSecondary = Color(0xFF3E2D1B),
-    secondaryContainer = Color(0xFF564430),
-    onSecondaryContainer = Color(0xFFE5D6C6),
-    tertiary = OrangeAccent80,
-    surface = Color(0xFF1F1B16),
-    onSurface = Color(0xFFEAE1D9),
-    surfaceVariant = Color(0xFF504539),
-    onSurfaceVariant = Color(0xFFD3C4B4)
-)
-
-private val OrangeLightColorScheme = lightColorScheme(
-    primary = Orange40,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFDCC2),
-    onPrimaryContainer = Color(0xFF2C1600),
-    secondary = OrangeGrey40,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE5D6C6),
-    onSecondaryContainer = Color(0xFF231A0D),
-    tertiary = OrangeAccent40,
-    surface = Color(0xFFFFFBFF),
-    onSurface = Color(0xFF1F1B16)
-)
-
-// Pink Color Schemes
-private val PinkDarkColorScheme = darkColorScheme(
-    primary = PinkBright80,
-    onPrimary = Color(0xFF5D1149),
-    primaryContainer = Color(0xFF7B2962),
-    onPrimaryContainer = Color(0xFFFFD8E8),
-    secondary = PinkGrey80,
-    onSecondary = Color(0xFF3B2838),
-    secondaryContainer = Color(0xFF533E4F),
-    onSecondaryContainer = Color(0xFFE8D6E3),
-    tertiary = PinkAccent80,
-    surface = Color(0xFF1E1A1D),
-    onSurface = Color(0xFFE9E0E4),
-    surfaceVariant = Color(0xFF4D444B),
-    onSurfaceVariant = Color(0xFFCFC4CB)
-)
-
-private val PinkLightColorScheme = lightColorScheme(
-    primary = PinkBright40,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFD8E8),
-    onPrimaryContainer = Color(0xFF3E0021),
-    secondary = PinkGrey40,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE8D6E3),
-    onSecondaryContainer = Color(0xFF231320),
-    tertiary = PinkAccent40,
-    surface = Color(0xFFFFFBFF),
-    onSurface = Color(0xFF1E1A1D)
-)
-
-// Red Color Schemes
-private val RedDarkColorScheme = darkColorScheme(
-    primary = Red80,
-    onPrimary = Color(0xFF690005),
-    primaryContainer = Color(0xFF93000A),
-    onPrimaryContainer = Color(0xFFFFDAD6),
-    secondary = RedGrey80,
-    onSecondary = Color(0xFF442926),
-    secondaryContainer = Color(0xFF5D3F3B),
-    onSecondaryContainer = Color(0xFFE8D6D4),
-    tertiary = RedAccent80,
-    surface = Color(0xFF1F1A1A),
-    onSurface = Color(0xFFEAE0DF),
-    surfaceVariant = Color(0xFF524241),
-    onSurfaceVariant = Color(0xFFD7C1BF)
-)
-
-private val RedLightColorScheme = lightColorScheme(
-    primary = Red40,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFDAD6),
-    onPrimaryContainer = Color(0xFF410002),
-    secondary = RedGrey40,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE8D6D4),
-    onSecondaryContainer = Color(0xFF2C1512),
-    tertiary = RedAccent40,
-    surface = Color(0xFFFFFBFF),
-    onSurface = Color(0xFF1F1A1A)
-)
+// Pre-generated color schemes for better performance
+private val PurpleLightColorScheme by lazy { generateColorScheme(SEED_PURPLE, false) }
+private val PurpleDarkColorScheme by lazy { generateColorScheme(SEED_PURPLE, true) }
+private val BlueLightColorScheme by lazy { generateColorScheme(SEED_BLUE, false) }
+private val BlueDarkColorScheme by lazy { generateColorScheme(SEED_BLUE, true) }
+private val GreenLightColorScheme by lazy { generateColorScheme(SEED_GREEN, false) }
+private val GreenDarkColorScheme by lazy { generateColorScheme(SEED_GREEN, true) }
+private val OrangeLightColorScheme by lazy { generateColorScheme(SEED_ORANGE, false) }
+private val OrangeDarkColorScheme by lazy { generateColorScheme(SEED_ORANGE, true) }
+private val PinkLightColorScheme by lazy { generateColorScheme(SEED_PINK, false) }
+private val PinkDarkColorScheme by lazy { generateColorScheme(SEED_PINK, true) }
+private val RedLightColorScheme by lazy { generateColorScheme(SEED_RED, false) }
+private val RedDarkColorScheme by lazy { generateColorScheme(SEED_RED, true) }
 
 @Composable
 fun EuphoriaeTheme(
