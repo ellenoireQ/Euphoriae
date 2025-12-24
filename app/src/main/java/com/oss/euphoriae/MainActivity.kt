@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.PlaylistPlay
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -69,6 +71,14 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 themeColor = themeColor
             ) {
+                val view = LocalView.current
+                if (!view.isInEditMode) {
+                    SideEffect {
+                        val window = (view.context as ComponentActivity).window
+                        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+                    }
+                }
+                
                 EuphoriaeMainApp(
                     themePreferences = themePreferences,
                     currentThemeColor = themeColor,
