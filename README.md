@@ -32,19 +32,26 @@
 ## Screenshots
 
 <p align="center">
-  <img src="screenshoots/Screenshot_20251223-182621_Euphoriae.png" width="200" alt="Home Screen"/>
-  <img src="screenshoots/Screenshot_20251223-182627_Euphoriae.png" width="200" alt="Songs List"/>
-  <img src="screenshoots/Screenshot_20251223-183507_Euphoriae.png" width="200" alt="Songs List 2"/>
-  <img src="screenshoots/Screenshot_20251223-182635_Euphoriae.png" width="200" alt="Playlists"/>
-  <img src="screenshoots/Screenshot_20251223-182638_Euphoriae.png" width="200" alt="Equalizer"/>
+  <img src="screenshoots/Screenshot_20251224-173516_Euphoriae.png" width="200" alt="Home Screen"/>
+  <img src="screenshoots/Screenshot_20251224-173521_Euphoriae.png" width="200" alt="Songs List"/>
+  <img src="screenshoots/Screenshot_20251224-173528_Euphoriae.png" width="200" alt="Playlist"/>
+  <img src="screenshoots/Screenshot_20251224-173539_Euphoriae.png" width="200" alt="Playlist Detail"/>
+  <img src="screenshoots/Screenshot_20251224-173544_Euphoriae.png" width="200" alt="Playlist Songs"/>
 </p>
 
 <p align="center">
-  <img src="screenshoots/Screenshot_20251223-182639_Euphoriae.png" width="200" alt="Now Playing"/>
-  <img src="screenshoots/Screenshot_20251223-182642_Euphoriae.png" width="200" alt="Now Playing 2"/>
-  <img src="screenshoots/Screenshot_20251223-182644_Euphoriae.png" width="200" alt="Settings"/>
-  <img src="screenshoots/Screenshot_20251223-182714_Pixel Launcher.png" width="200" alt="Pixel Launcher"/>
-  <img src="screenshoots/Screenshot_20251223-182720_Pixel Launcher.png" width="200" alt="Pixel Launcher 2"/>
+  <img src="screenshoots/Screenshot_20251224-173555_Euphoriae.png" width="200" alt="Now Playing"/>
+  <img src="screenshoots/Screenshot_20251224-173600_Euphoriae.png" width="200" alt="Now Playing 2"/>
+  <img src="screenshoots/Screenshot_20251224-173608_Euphoriae.png" width="200" alt="Search"/>
+  <img src="screenshoots/Screenshot_20251224-173621_Euphoriae.png" width="200" alt="Equalizer"/>
+  <img src="screenshoots/Screenshot_20251224-173623_Euphoriae.png" width="200" alt="Equalizer 2"/>
+</p>
+
+<p align="center">
+  <img src="screenshoots/Screenshot_20251224-173628_Euphoriae.png" width="200" alt="Settings"/>
+  <img src="screenshoots/Screenshot_20251224-173632_Euphoriae.png" width="200" alt="Settings 2"/>
+  <img src="screenshoots/Screenshot_20251224-173635_Euphoriae.png" width="200" alt="Settings 3"/>
+  <img src="screenshoots/Screenshot_20251224-173645_Euphoriae.png" width="200" alt="Light Mode"/>
 </p>
 
 ## Tech Stack
