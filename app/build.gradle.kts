@@ -26,6 +26,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -90,5 +91,8 @@ dependencies {
 
     // Color picker
     implementation(libs.androidx.palette.ktx)
+
+    // DataStore Preferences
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
 }

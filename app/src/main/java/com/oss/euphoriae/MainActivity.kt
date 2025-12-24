@@ -29,6 +29,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.oss.euphoriae.data.model.Song
+import com.oss.euphoriae.data.preferences.ThemeColorOption
+import com.oss.euphoriae.data.preferences.ThemePreferences
 import com.oss.euphoriae.ui.components.MiniPlayer
 import com.oss.euphoriae.ui.screens.EqualizerScreen
 import com.oss.euphoriae.ui.screens.HomeScreen
@@ -39,17 +41,28 @@ import com.oss.euphoriae.ui.screens.SettingsScreen
 import com.oss.euphoriae.ui.screens.SongsScreen
 import com.oss.euphoriae.ui.theme.EuphoriaeTheme
 import com.oss.euphoriae.ui.viewmodel.MusicViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    
+    private val themePreferences by lazy { ThemePreferences(applicationContext) }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val themeColor by themePreferences.themeColor.collectAsStateWithLifecycle(
+                initialValue = ThemeColorOption.DYNAMIC
+            )
+            
             EuphoriaeTheme(
                 darkTheme = true,
-                dynamicColor = true
+                themeColor = themeColor
             ) {
-                EuphoriaeMainApp()
+                EuphoriaeMainApp(
+                    themePreferences = themePreferences,
+                    currentThemeColor = themeColor
+                )
             }
         }
     }
@@ -69,7 +82,9 @@ enum class Destination(
 
 @Composable
 fun EuphoriaeMainApp(
-    viewModel: MusicViewModel = viewModel()
+    viewModel: MusicViewModel = viewModel(),
+    themePreferences: ThemePreferences,
+    currentThemeColor: ThemeColorOption
 ) {
     val navController = rememberNavController()
     val startDestination = Destination.HOME
@@ -85,6 +100,8 @@ fun EuphoriaeMainApp(
     val showBottomBar = currentRoute != "now_playing"
     
     val snackbarHostState = remember { SnackbarHostState() }
+    
+    val coroutineScope = rememberCoroutineScope()
     
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
@@ -181,6 +198,12 @@ fun EuphoriaeMainApp(
                 onLoadPlaylistSongs = { viewModel.loadPlaylistSongs(it) },
                 playlistSongs = uiState.playlistSongs,
                 audioEffectsManager = viewModel.audioEffectsManager,
+                currentThemeColor = currentThemeColor,
+                onThemeColorChange = { option ->
+                    coroutineScope.launch {
+                        themePreferences.setThemeColor(option)
+                    }
+                },
                 modifier = Modifier.padding(contentPadding)
             )
         }
@@ -200,6 +223,8 @@ fun AppNavHost(
     onLoadPlaylistSongs: (Long) -> Unit,
     playlistSongs: List<Song>,
     audioEffectsManager: com.oss.euphoriae.data.`class`.AudioEffectsManager,
+    currentThemeColor: ThemeColorOption,
+    onThemeColorChange: (ThemeColorOption) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedPlaylist by remember { mutableStateOf<com.oss.euphoriae.data.model.Playlist?>(null) }
@@ -259,7 +284,9 @@ fun AppNavHost(
         }
         composable("settings") {
             SettingsScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                currentThemeColor = currentThemeColor,
+                onThemeColorChange = onThemeColorChange
             )
         }
     }
