@@ -28,7 +28,33 @@ class MusicRepository(
     
     suspend fun deleteSong(song: Song) = musicDao.deleteSong(song)
     
-    fun getAllPlaylists(): Flow<List<Playlist>> = musicDao.getAllPlaylists()
+    fun getAllPlaylists(): Flow<List<Playlist>> {
+        return kotlinx.coroutines.flow.combine(
+            musicDao.getAllPlaylists(),
+            musicDao.getAllPlaylistItems()
+        ) { playlists, items ->
+            playlists.map { playlist ->
+                val playlistItems = items.filter { it.playlistId == playlist.id }
+                val songCount = playlistItems.size
+                val covers = playlistItems
+                    .mapNotNull { it.albumArtUri }
+                    .filter { it.isNotEmpty() }
+                    .distinct()
+                    .take(4)
+                
+                // create new playlist instance with populated data
+                // We use the helper method we added to Playlist class, or just constructor
+                 com.oss.euphoriae.data.model.Playlist(
+                    id = playlist.id,
+                    name = playlist.name,
+                    coverUri = covers.firstOrNull(), // Use first song cover as main cover if no custom cover
+                    createdAt = playlist.createdAt,
+                    songCount = songCount,
+                    covers = covers
+                )
+            }
+        }
+    }
     
     suspend fun getPlaylistById(playlistId: Long): Playlist? = musicDao.getPlaylistById(playlistId)
     

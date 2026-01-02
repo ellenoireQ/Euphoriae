@@ -57,4 +57,12 @@ interface MusicDao {
     
     @Query("SELECT s.* FROM songs s INNER JOIN playlist_songs ps ON s.id = ps.songId WHERE ps.playlistId = :playlistId ORDER BY ps.addedAt DESC")
     fun getSongsInPlaylist(playlistId: Long): Flow<List<Song>>
+
+    @Query("SELECT ps.playlistId, s.albumArtUri FROM playlist_songs ps JOIN songs s ON ps.songId = s.id")
+    fun getAllPlaylistItems(): Flow<List<PlaylistItem>>
 }
+
+data class PlaylistItem(
+    val playlistId: Long,
+    val albumArtUri: String?
+)

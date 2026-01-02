@@ -28,39 +28,34 @@ fun AlbumCard(
         shape = RoundedCornerShape(12.dp)
     ) {
         Column {
-            if (album.covers.size >= 4) {
-                 // 2x2 Grid using first 4 covers
-                 Column(modifier = Modifier
+            if (album.covers.size >= 3) {
+                 // 3-Image Collage: 1 Big Left, 2 Small Right Stacked
+                 Row(modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                  ) {
-                     Row(modifier = Modifier.weight(1f)) {
-                         AsyncImage(
-                             model = album.covers[0],
-                             contentDescription = null,
-                             contentScale = ContentScale.Crop,
-                             modifier = Modifier.weight(1f).fillMaxHeight()
-                         )
+                     // Main Image (Left Half)
+                     AsyncImage(
+                         model = album.covers[0],
+                         contentDescription = null,
+                         contentScale = ContentScale.Crop,
+                         modifier = Modifier.weight(1f).fillMaxHeight()
+                     )
+                     
+                     // Stacked Images (Right Half)
+                     Column(modifier = Modifier.weight(1f)) {
                          AsyncImage(
                              model = album.covers[1],
                              contentDescription = null,
                              contentScale = ContentScale.Crop,
-                             modifier = Modifier.weight(1f).fillMaxHeight()
+                             modifier = Modifier.weight(1f).fillMaxWidth()
                          )
-                     }
-                     Row(modifier = Modifier.weight(1f)) {
                          AsyncImage(
                              model = album.covers[2],
                              contentDescription = null,
                              contentScale = ContentScale.Crop,
-                             modifier = Modifier.weight(1f).fillMaxHeight()
-                         )
-                         AsyncImage(
-                             model = album.covers[3],
-                             contentDescription = null,
-                             contentScale = ContentScale.Crop,
-                             modifier = Modifier.weight(1f).fillMaxHeight()
+                             modifier = Modifier.weight(1f).fillMaxWidth()
                          )
                      }
                  }

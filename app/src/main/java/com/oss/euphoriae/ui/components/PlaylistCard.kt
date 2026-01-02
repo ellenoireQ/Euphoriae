@@ -28,7 +28,38 @@ fun PlaylistCard(
         shape = RoundedCornerShape(12.dp)
     ) {
         Column {
-            if (playlist.coverUri != null) {
+            if (playlist.covers.size >= 3) {
+                 // 3-Image Collage: 1 Big Left, 2 Small Right Stacked
+                 Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                 ) {
+                     // Main Image (Left Half)
+                     AsyncImage(
+                         model = playlist.covers[0],
+                         contentDescription = null,
+                         contentScale = ContentScale.Crop,
+                         modifier = Modifier.weight(1f).fillMaxHeight()
+                     )
+                     
+                     // Stacked Images (Right Half)
+                     Column(modifier = Modifier.weight(1f)) {
+                         AsyncImage(
+                             model = playlist.covers[1],
+                             contentDescription = null,
+                             contentScale = ContentScale.Crop,
+                             modifier = Modifier.weight(1f).fillMaxWidth()
+                         )
+                         AsyncImage(
+                             model = playlist.covers[2],
+                             contentDescription = null,
+                             contentScale = ContentScale.Crop,
+                             modifier = Modifier.weight(1f).fillMaxWidth()
+                         )
+                     }
+                 }
+            } else if (playlist.coverUri != null) {
                 AsyncImage(
                     model = playlist.coverUri,
                     contentDescription = playlist.name,
@@ -58,6 +89,13 @@ fun PlaylistCard(
                 Text(
                     text = playlist.name,
                     style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "${playlist.songCount} Songs",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
