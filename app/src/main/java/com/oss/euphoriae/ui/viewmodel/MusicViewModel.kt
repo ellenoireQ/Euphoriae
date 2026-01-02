@@ -46,7 +46,8 @@ data class MusicUiState(
     val isShuffleOn: Boolean = false,
     val repeatMode: Int = 0,
     val tempo: Float = 1.0f,
-    val pitch: Float = 0.0f
+    val pitch: Float = 0.0f,
+    val albums: List<com.oss.euphoriae.data.model.Album> = emptyList()
 )
 
 class MusicViewModel(application: Application) : AndroidViewModel(application) {
@@ -111,6 +112,7 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
         initializeAudioEngine()
         loadSongs()
         loadPlaylists()
+        loadAlbums()
         connectToService()
     }
     
@@ -557,6 +559,39 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repository.getSongsInPlaylist(playlistId).collect { songs ->
                 _uiState.update { it.copy(playlistSongs = songs) }
+            }
+        }
+    }
+    
+    fun createPlaylistFromAlbum(album: com.oss.euphoriae.data.model.Album) {
+        viewModelScope.launch {
+            try {
+                // 1. Create playlist with album name
+                val playlistId = repository.createPlaylist(name = album.name)
+                
+                // 2. Get all songs from this album
+                val albumSongs = repository.getSongsByAlbumId(album.id)
+                
+                // 3. Add all songs to the new playlist
+                albumSongs.forEach { song ->
+                    repository.addSongToPlaylist(playlistId, song.id)
+                }
+                
+                // 4. Force refresh of playlists to show the new one immediately
+                // The repository.getAllPlaylists() flow should handle this automatically, 
+                // but sometimes it needs a nudge if we just inserted.
+            } catch (e: Exception) {
+                _uiState.update { 
+                    it.copy(error = "Failed to create playlist from album: ${e.message}")
+                }
+            }
+        }
+    }
+    
+    private fun loadAlbums() {
+        viewModelScope.launch {
+            repository.getAlbums().collect { albums ->
+                _uiState.update { it.copy(albums = albums) }
             }
         }
     }

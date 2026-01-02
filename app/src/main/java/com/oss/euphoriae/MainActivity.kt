@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.PlaylistPlay
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -98,6 +99,7 @@ enum class Destination(
 ) {
     HOME("home", "Home", Icons.Default.Home, "Home"),
     SONGS("songs", "Songs", Icons.Default.MusicNote, "Songs"),
+    ALBUMS("albums", "Albums", Icons.Default.Album, "Albums"),
     PLAYLISTS("playlists", "Playlists", Icons.Default.PlaylistPlay, "Playlists"),
     EQUALIZER("equalizer", "Equalizer", Icons.Default.GraphicEq, "Equalizer")
 }
@@ -215,6 +217,7 @@ fun EuphoriaeMainApp(
                 onScanClick = { viewModel.scanMusic() },
                 onSearchQueryChange = { viewModel.searchSongs(it) },
                 onCreatePlaylist = { viewModel.createPlaylist(it) },
+                onCreatePlaylistFromAlbum = { viewModel.createPlaylistFromAlbum(it) },
                 onDeletePlaylist = { viewModel.deletePlaylist(it) },
                 onLoadPlaylistSongs = { viewModel.loadPlaylistSongs(it) },
                 playlistSongs = uiState.playlistSongs,
@@ -244,6 +247,7 @@ fun AppNavHost(
     onScanClick: () -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onCreatePlaylist: (String) -> Unit,
+    onCreatePlaylistFromAlbum: (com.oss.euphoriae.data.model.Album) -> Unit,
     onDeletePlaylist: (com.oss.euphoriae.data.model.Playlist) -> Unit,
     onLoadPlaylistSongs: (Long) -> Unit,
     playlistSongs: List<Song>,
@@ -280,6 +284,12 @@ fun AppNavHost(
                 onSearchQueryChange = onSearchQueryChange,
                 onSongClick = onSongClick,
                 currentPlayingSong = uiState.currentSong
+            )
+        }
+        composable(Destination.ALBUMS.route) {
+            com.oss.euphoriae.ui.screens.AlbumsScreen(
+                albums = uiState.albums,
+                onCreatePlaylistFromAlbum = onCreatePlaylistFromAlbum
             )
         }
         composable(Destination.PLAYLISTS.route) {

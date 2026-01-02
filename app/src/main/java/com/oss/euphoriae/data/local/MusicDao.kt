@@ -1,6 +1,7 @@
 package com.oss.euphoriae.data.local
 
 import androidx.room.*
+import com.oss.euphoriae.data.model.Album
 import com.oss.euphoriae.data.model.Playlist
 import com.oss.euphoriae.data.model.PlaylistSong
 import com.oss.euphoriae.data.model.Song
@@ -10,6 +11,12 @@ import kotlinx.coroutines.flow.Flow
 interface MusicDao {
     @Query("SELECT * FROM songs ORDER BY title ASC")
     fun getAllSongs(): Flow<List<Song>>
+
+    @Query("SELECT albumId as id, album as name, artist, albumArtUri as coverUri, COUNT(*) as songCount FROM songs GROUP BY albumId ORDER BY album ASC")
+    fun getAlbums(): Flow<List<Album>>
+    
+    @Query("SELECT * FROM songs WHERE albumId = :albumId ORDER BY title ASC")
+    suspend fun getSongsByAlbumId(albumId: Long): List<Song>
     
     @Query("SELECT * FROM songs WHERE id = :songId")
     suspend fun getSongById(songId: Long): Song?

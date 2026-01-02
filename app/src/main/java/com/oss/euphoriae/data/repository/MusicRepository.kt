@@ -49,6 +49,10 @@ class MusicRepository(
     
     fun getSongsInPlaylist(playlistId: Long): Flow<List<Song>> = musicDao.getSongsInPlaylist(playlistId)
     
+    fun getAlbums(): Flow<List<com.oss.euphoriae.data.model.Album>> = musicDao.getAlbums()
+    
+    suspend fun getSongsByAlbumId(albumId: Long): List<Song> = musicDao.getSongsByAlbumId(albumId)
+
     suspend fun scanAndImportMusic(): Int = withContext(Dispatchers.IO) {
         val songs = mutableListOf<Song>()
         
@@ -102,6 +106,7 @@ class MusicRepository(
                     title = title,
                     artist = artist,
                     album = album,
+                    albumId = albumId,
                     duration = duration,
                     data = data,
                     albumArtUri = albumArtUri,
