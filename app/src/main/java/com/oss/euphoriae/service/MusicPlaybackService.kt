@@ -9,6 +9,8 @@ import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
@@ -17,6 +19,12 @@ import com.oss.euphoriae.MainActivity
 import com.oss.euphoriae.engine.AudioEngine
 import com.oss.euphoriae.engine.NativeAudioProcessor
 import com.oss.euphoriae.engine.NativeRenderersFactory
+import com.oss.euphoriae.widget.WidgetUpdater
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
 class MusicPlaybackService : MediaSessionService() {
@@ -26,10 +34,27 @@ class MusicPlaybackService : MediaSessionService() {
     private var audioEngine: AudioEngine? = null
     private var renderersFactory: NativeRenderersFactory? = null
     
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    
+    private val widgetPlayerListener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            updateWidget()
+        }
+        
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            updateWidget()
+        }
+    }
+    
     companion object {
         private const val NOTIFICATION_CHANNEL_ID = "euphoriae_playback_channel"
         private const val TAG = "MusicPlaybackService"
         var crossfadeDurationMs: Long = 0  // 0 = disabled, up to 12000ms
+        
+        // Widget action constants
+        const val ACTION_PLAY_PAUSE = "com.oss.euphoriae.action.PLAY_PAUSE"
+        const val ACTION_NEXT = "com.oss.euphoriae.action.NEXT"
+        const val ACTION_PREVIOUS = "com.oss.euphoriae.action.PREVIOUS"
     }
     
     override fun onCreate() {
@@ -52,6 +77,9 @@ class MusicPlaybackService : MediaSessionService() {
             .setHandleAudioBecomingNoisy(true)
             .build()
         
+        // Add widget update listener
+        player?.addListener(widgetPlayerListener)
+        
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
@@ -67,6 +95,36 @@ class MusicPlaybackService : MediaSessionService() {
             .build()
         
         Log.d(TAG, "MusicPlaybackService created with native audio processing pipeline")
+    }
+    
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val result = super.onStartCommand(intent, flags, startId)
+        
+        when (intent?.action) {
+            ACTION_PLAY_PAUSE -> {
+                player?.let {
+                    if (it.isPlaying) it.pause() else it.play()
+                }
+            }
+            ACTION_NEXT -> {
+                player?.let {
+                    if (it.hasNextMediaItem()) {
+                        it.seekToNext()
+                    }
+                }
+            }
+            ACTION_PREVIOUS -> {
+                player?.let {
+                    if (it.currentPosition > 3000) {
+                        it.seekTo(0)
+                    } else if (it.hasPreviousMediaItem()) {
+                        it.seekToPrevious()
+                    }
+                }
+            }
+        }
+        
+        return result
     }
     
     private fun initializeAudioEngine() {
@@ -120,6 +178,9 @@ class MusicPlaybackService : MediaSessionService() {
         audioEngine = null
         renderersFactory = null
         
+        // Cancel coroutine scope
+        serviceScope.cancel()
+        
         Log.d(TAG, "MusicPlaybackService destroyed")
         super.onDestroy()
     }
@@ -147,5 +208,27 @@ class MusicPlaybackService : MediaSessionService() {
     
     fun setNativeEqualizerBand(band: Int, gain: Float) {
         audioEngine?.setEqualizerBand(band, gain)
+    }
+    
+    private fun updateWidget() {
+        serviceScope.launch {
+            val currentPlayer = player ?: return@launch
+            val mediaItem = currentPlayer.currentMediaItem
+            val metadata = mediaItem?.mediaMetadata
+            
+            val songTitle = metadata?.title?.toString() ?: "No song playing"
+            val songArtist = metadata?.artist?.toString() ?: "Euphoriae"
+            val albumArtUri = metadata?.artworkUri?.toString()
+            val isPlaying = currentPlayer.isPlaying
+            
+            WidgetUpdater.updateWidgetState(
+                context = this@MusicPlaybackService,
+                songTitle = songTitle,
+                songArtist = songArtist,
+                albumArtUri = albumArtUri,
+                isPlaying = isPlaying,
+                songId = mediaItem?.mediaId?.toLongOrNull() ?: -1L
+            )
+        }
     }
 }

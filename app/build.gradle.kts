@@ -117,4 +117,8 @@ dependencies {
     // Material Color Utilities
     implementation("com.google.android.material:material:1.11.0")
 
+    // Glance for App Widgets
+    implementation("androidx.glance:glance-appwidget:1.1.0")
+    implementation("androidx.glance:glance-material3:1.1.0")
+
 }

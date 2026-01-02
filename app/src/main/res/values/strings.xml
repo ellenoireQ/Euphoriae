@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Euphoriae</string>
+    <string name="widget_description">Music player controls widget</string>
+    <string name="no_song_playing">No song playing</string>
+    <string name="album_art">Album Art</string>
+    <string name="previous">Previous</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="next">Next</string>
 </resources>
