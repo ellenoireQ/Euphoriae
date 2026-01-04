@@ -170,6 +170,8 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 mediaController = controllerFuture?.get()
                 mediaController?.addListener(playerListener)
+                // Sync current playback state from service
+                syncWithController()
             } catch (e: Exception) {
                 android.util.Log.e("MusicViewModel", "Failed to connect to service", e)
             }
@@ -180,6 +182,65 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
         val app = getApplication<Application>()
         val intent = Intent(app, MusicPlaybackService::class.java)
         app.startService(intent)
+    }
+    
+    /**
+     * Sync UI state with the current playback state from MediaController.
+     * This is called when the controller connects to restore the playback state
+     * when opening the app from widget or notification.
+     */
+    private fun syncWithController() {
+        val controller = mediaController ?: return
+        
+        viewModelScope.launch {
+            try {
+                val currentMediaItem = controller.currentMediaItem
+                if (currentMediaItem != null) {
+                    // Get song info from media item metadata
+                    val title = currentMediaItem.mediaMetadata.title?.toString() ?: ""
+                    val artist = currentMediaItem.mediaMetadata.artist?.toString() ?: ""
+                    
+                    // Try to find the song in the database by matching title and artist
+                    val songs = _uiState.value.songs
+                    var matchingSong = songs.find { 
+                        it.title == title && it.artist == artist 
+                    }
+                    
+                    // If songs not loaded yet, wait and try again
+                    if (matchingSong == null && songs.isEmpty()) {
+                        delay(500) // Wait for songs to load
+                        matchingSong = _uiState.value.songs.find { 
+                            it.title == title && it.artist == artist 
+                        }
+                    }
+                    
+                    if (matchingSong != null) {
+                        val currentPosition = controller.currentPosition
+                        val duration = controller.duration.takeIf { it > 0 } ?: matchingSong.duration
+                        val progress = if (duration > 0) currentPosition.toFloat() / duration else 0f
+                        
+                        _uiState.update {
+                            it.copy(
+                                currentSong = matchingSong,
+                                isPlaying = controller.isPlaying,
+                                currentPosition = currentPosition,
+                                duration = duration,
+                                progress = progress.coerceIn(0f, 1f)
+                            )
+                        }
+                        
+                        android.util.Log.i("MusicViewModel", "Synced with controller: ${matchingSong.title}, playing: ${controller.isPlaying}")
+                        
+                        // Start progress updates if playing
+                        if (controller.isPlaying) {
+                            startProgressUpdates()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("MusicViewModel", "Failed to sync with controller", e)
+            }
+        }
     }
     
     private fun loadSongs() {

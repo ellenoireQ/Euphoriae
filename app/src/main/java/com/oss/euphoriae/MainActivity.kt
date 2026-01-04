@@ -51,12 +51,19 @@ import com.oss.euphoriae.engine.AudioEngine
 
 class MainActivity : ComponentActivity() {
     
+    companion object {
+        const val EXTRA_OPEN_NOW_PLAYING = "extra_open_now_playing"
+    }
+    
     private val themePreferences by lazy { ThemePreferences(applicationContext) }
     private val audioPreferences by lazy { AudioPreferences(applicationContext) }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        val shouldOpenNowPlaying = intent?.getBooleanExtra(EXTRA_OPEN_NOW_PLAYING, false) == true
+        
         setContent {
             val themeColor by themePreferences.themeColor.collectAsStateWithLifecycle(
                 initialValue = ThemeColorOption.DYNAMIC
@@ -87,7 +94,8 @@ class MainActivity : ComponentActivity() {
                     themePreferences = themePreferences,
                     audioPreferences = audioPreferences,
                     currentThemeColor = themeColor,
-                    currentDarkMode = darkModeOption
+                    currentDarkMode = darkModeOption,
+                    initialShowNowPlaying = shouldOpenNowPlaying
                 )
             }
         }
@@ -113,7 +121,8 @@ fun EuphoriaeMainApp(
     themePreferences: ThemePreferences,
     audioPreferences: AudioPreferences,
     currentThemeColor: ThemeColorOption,
-    currentDarkMode: DarkModeOption
+    currentDarkMode: DarkModeOption,
+    initialShowNowPlaying: Boolean = false
 ) {
     val navController = rememberNavController()
     val startDestination = Destination.HOME
@@ -121,7 +130,7 @@ fun EuphoriaeMainApp(
     
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
-    var showNowPlaying by remember { mutableStateOf(false) }
+    var showNowPlaying by remember { mutableStateOf(initialShowNowPlaying) }
     
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route

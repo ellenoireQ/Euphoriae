@@ -1,6 +1,7 @@
 package com.oss.euphoriae.widget
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -9,9 +10,9 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
-import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -40,19 +41,24 @@ class MusicWidget : GlanceAppWidget() {
             val state = WidgetState.fromPreferences(currentState())
             
             GlanceTheme {
-                WidgetContent(state = state)
+                WidgetContent(context = context, state = state)
             }
         }
     }
     
     @Composable
-    private fun WidgetContent(state: WidgetState) {
+    private fun WidgetContent(context: Context, state: WidgetState) {
+        val openNowPlayingIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(MainActivity.EXTRA_OPEN_NOW_PLAYING, true)
+        }
+        
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(GlanceTheme.colors.surfaceVariant)
                 .cornerRadius(16.dp)
-                .clickable(actionStartActivity<MainActivity>())
+                .clickable(actionStartActivity(openNowPlayingIntent))
                 .padding(12.dp)
         ) {
             Row(
