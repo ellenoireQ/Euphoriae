@@ -36,6 +36,7 @@ import com.oss.euphoriae.data.model.Song
 import com.oss.euphoriae.data.preferences.DarkModeOption
 import com.oss.euphoriae.data.preferences.ThemeColorOption
 import com.oss.euphoriae.data.preferences.ThemePreferences
+import com.oss.euphoriae.data.preferences.AudioPreferences
 import com.oss.euphoriae.ui.components.MiniPlayer
 import com.oss.euphoriae.ui.screens.EqualizerScreen
 import com.oss.euphoriae.ui.screens.HomeScreen
@@ -51,6 +52,7 @@ import com.oss.euphoriae.engine.AudioEngine
 class MainActivity : ComponentActivity() {
     
     private val themePreferences by lazy { ThemePreferences(applicationContext) }
+    private val audioPreferences by lazy { AudioPreferences(applicationContext) }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +85,7 @@ class MainActivity : ComponentActivity() {
                 
                 EuphoriaeMainApp(
                     themePreferences = themePreferences,
+                    audioPreferences = audioPreferences,
                     currentThemeColor = themeColor,
                     currentDarkMode = darkModeOption
                 )
@@ -108,6 +111,7 @@ enum class Destination(
 fun EuphoriaeMainApp(
     viewModel: MusicViewModel = viewModel(),
     themePreferences: ThemePreferences,
+    audioPreferences: AudioPreferences,
     currentThemeColor: ThemeColorOption,
     currentDarkMode: DarkModeOption
 ) {
@@ -225,6 +229,7 @@ fun EuphoriaeMainApp(
                 playlistSongs = uiState.playlistSongs,
                 audioEffectsManager = viewModel.audioEffectsManager,
                 audioEngine = viewModel.audioEngine,
+                audioPreferences = audioPreferences,
                 onPlaybackParamsChange = { t, p -> viewModel.setPlaybackParameters(t, p) },
                 currentThemeColor = currentThemeColor,
                 onThemeColorChange = { option ->
@@ -255,6 +260,7 @@ fun AppNavHost(
     playlistSongs: List<Song>,
     audioEffectsManager: com.oss.euphoriae.data.`class`.AudioEffectsManager,
     audioEngine: AudioEngine?,
+    audioPreferences: AudioPreferences,
     onPlaybackParamsChange: (Float, Float) -> Unit,
     currentThemeColor: ThemeColorOption,
     onThemeColorChange: (ThemeColorOption) -> Unit,
@@ -324,6 +330,7 @@ fun AppNavHost(
             EqualizerScreen(
                 audioEffectsManager = audioEffectsManager,
                 audioEngine = audioEngine,
+                audioPreferences = audioPreferences,
                 onPlaybackParamsChange = onPlaybackParamsChange
             )
         }

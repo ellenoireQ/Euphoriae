@@ -177,9 +177,57 @@ class MusicPlaybackService : MediaSessionService() {
                 create()
             }
             Log.d(TAG, "Native AudioEngine singleton initialized")
+            
+            // Apply saved audio settings from preferences
+            applySavedAudioSettings()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to initialize native AudioEngine", e)
         }
+    }
+    
+    private fun applySavedAudioSettings() {
+        val prefs = com.oss.euphoriae.data.preferences.AudioPreferences(this)
+        val engine = audioEngine ?: return
+        
+        // Apply 10-band EQ
+        for (band in 0 until 10) {
+            val level = prefs.getBandLevel(band)
+            engine.setEqualizerBand(band, level * 12f) // Convert -1..1 to dB (-12 to +12)
+        }
+        
+        // Apply basic effects
+        engine.setBassBoost(prefs.getBassBoost())
+        engine.setVirtualizer(prefs.getVirtualizer())
+        
+        // Apply surround settings
+        engine.setStereoBalance(prefs.getStereoBalance())
+        engine.setChannelSeparation(prefs.getChannelSeparation())
+        engine.setSurroundLevel(prefs.getSurroundLevel())
+        engine.setRoomSize(prefs.getRoomSize())
+        engine.setSurround3D(prefs.get3DEffect())
+        
+        // Apply headphone settings
+        engine.setHeadphoneType(prefs.getHeadphoneType().ordinal)
+        engine.setHeadphoneSurround(prefs.getHeadphoneSurround())
+        
+        // Apply dynamic processing
+        engine.setCompressor(prefs.getCompressor())
+        engine.setVolumeLeveler(prefs.getVolumeLeveler())
+        engine.setLimiter(0.99f - (prefs.getLimiter() * 0.49f))
+        
+        // Apply enhancement
+        engine.setClarity(prefs.getClarity())
+        engine.setSpectrumExtension(prefs.getSpectrumExtension())
+        engine.setTubeWarmth(prefs.getTubeAmp())
+        engine.setTrebleBoost(prefs.getTrebleBoost())
+        
+        // Apply reverb
+        val reverbPreset = prefs.getReverbPreset()
+        if (reverbPreset.ordinal > 0) {
+            engine.setReverb(reverbPreset.ordinal, 0.5f)
+        }
+        
+        Log.d(TAG, "Applied saved audio settings from preferences")
     }
     
     private fun createNotificationChannel() {

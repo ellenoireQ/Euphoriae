@@ -64,71 +64,94 @@ private val presetConfigs = mapOf(
 fun EqualizerScreen(
     audioEffectsManager: AudioEffectsManager? = null,
     audioEngine: AudioEngine? = null,
+    audioPreferences: com.oss.euphoriae.data.preferences.AudioPreferences? = null,
     onPlaybackParamsChange: (Float, Float) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
-    var isEnabled by remember { mutableStateOf(true) }
-    var selectedPreset by remember { mutableStateOf("Flat") }
-    var selectedProfile by remember { mutableStateOf(EffectProfile.CUSTOM) }
+    // Load initial values from preferences
+    var isEnabled by remember { mutableStateOf(audioPreferences?.isEqEnabled() ?: true) }
+    var selectedPreset by remember { mutableStateOf(audioPreferences?.getSelectedPreset() ?: "Flat") }
+    var selectedProfile by remember { mutableStateOf(audioPreferences?.getEffectProfile() ?: EffectProfile.CUSTOM) }
     
-    // 10-band EQ
+    // 10-band EQ - load from preferences
+    val bandNames = listOf("31", "62", "125", "250", "500", "1k", "2k", "4k", "8k", "16k")
+    val bandFrequencies = listOf("31Hz", "62Hz", "125Hz", "250Hz", "500Hz", "1kHz", "2kHz", "4kHz", "8kHz", "16kHz")
     var bands by remember {
         mutableStateOf(
-            listOf(
-                EqualizerBand("31", "31Hz", 0f),
-                EqualizerBand("62", "62Hz", 0f),
-                EqualizerBand("125", "125Hz", 0f),
-                EqualizerBand("250", "250Hz", 0f),
-                EqualizerBand("500", "500Hz", 0f),
-                EqualizerBand("1k", "1kHz", 0f),
-                EqualizerBand("2k", "2kHz", 0f),
-                EqualizerBand("4k", "4kHz", 0f),
-                EqualizerBand("8k", "8kHz", 0f),
-                EqualizerBand("16k", "16kHz", 0f)
-            )
+            bandNames.mapIndexed { index, name ->
+                EqualizerBand(name, bandFrequencies[index], audioPreferences?.getBandLevel(index) ?: 0f)
+            }
         )
     }
     
-    // Basic Effects
-    var bassBoost by remember { mutableFloatStateOf(audioEffectsManager?.getBassBoostLevel() ?: 0f) }
-    var virtualizer by remember { mutableFloatStateOf(audioEffectsManager?.getVirtualizerLevel() ?: 0f) }
+    // Basic Effects - load from preferences
+    var bassBoost by remember { mutableFloatStateOf(audioPreferences?.getBassBoost() ?: 0f) }
+    var virtualizer by remember { mutableFloatStateOf(audioPreferences?.getVirtualizer() ?: 0f) }
     
-    // DAC Settings
-    var reverbPreset by remember { mutableStateOf(audioEffectsManager?.getReverbPreset() ?: ReverbPreset.NONE) }
-    var loudnessGain by remember { mutableFloatStateOf(audioEffectsManager?.getLoudnessGain() ?: 0f) }
-    var stereoBalance by remember { mutableFloatStateOf(audioEffectsManager?.getStereoBalance() ?: 0f) }
-    var channelSeparation by remember { mutableFloatStateOf(audioEffectsManager?.getChannelSeparation() ?: 0.5f) }
+    // DSP Settings - load from preferences
+    var reverbPreset by remember { mutableStateOf(audioPreferences?.getReverbPreset() ?: ReverbPreset.NONE) }
+    var loudnessGain by remember { mutableFloatStateOf(audioPreferences?.getLoudnessGain() ?: 0f) }
+    var stereoBalance by remember { mutableFloatStateOf(audioPreferences?.getStereoBalance() ?: 0f) }
+    var channelSeparation by remember { mutableFloatStateOf(audioPreferences?.getChannelSeparation() ?: 0.5f) }
     
-    // Surround Settings
-    var surroundMode by remember { mutableStateOf(SurroundMode.OFF) }
-    var surroundLevel by remember { mutableFloatStateOf(0.5f) }
-    var roomSize by remember { mutableFloatStateOf(0.5f) }
-    var effect3d by remember { mutableFloatStateOf(0f) }
+    // Surround Settings - load from preferences
+    var surroundMode by remember { mutableStateOf(audioPreferences?.getSurroundMode() ?: SurroundMode.OFF) }
+    var surroundLevel by remember { mutableFloatStateOf(audioPreferences?.getSurroundLevel() ?: 0.5f) }
+    var roomSize by remember { mutableFloatStateOf(audioPreferences?.getRoomSize() ?: 0.5f) }
+    var effect3d by remember { mutableFloatStateOf(audioPreferences?.get3DEffect() ?: 0f) }
     
-    // Headphone Settings
-    var headphoneType by remember { mutableStateOf(HeadphoneType.GENERIC) }
-    var headphoneSurround by remember { mutableStateOf(false) }
+    // Headphone Settings - load from preferences
+    var headphoneType by remember { mutableStateOf(audioPreferences?.getHeadphoneType() ?: HeadphoneType.GENERIC) }
+    var headphoneSurround by remember { mutableStateOf(audioPreferences?.getHeadphoneSurround() ?: false) }
     
-    // Dynamic Processing
-    var compressor by remember { mutableFloatStateOf(0f) }
-    var volumeLeveler by remember { mutableFloatStateOf(0f) }
-    var limiter by remember { mutableFloatStateOf(0f) }
-    var dynamicRange by remember { mutableFloatStateOf(1f) }
+    // Dynamic Processing - load from preferences
+    var compressor by remember { mutableFloatStateOf(audioPreferences?.getCompressor() ?: 0f) }
+    var volumeLeveler by remember { mutableFloatStateOf(audioPreferences?.getVolumeLeveler() ?: 0f) }
+    var limiter by remember { mutableFloatStateOf(audioPreferences?.getLimiter() ?: 0f) }
+    var dynamicRange by remember { mutableFloatStateOf(audioPreferences?.getDynamicRange() ?: 1f) }
     
     // Tempo/Pitch Control
     var tempo by remember { mutableFloatStateOf(1f) }  // 0.5 to 2.0
     var pitch by remember { mutableFloatStateOf(0f) }  // -12 to +12 semitones
     var crossfade by remember { mutableFloatStateOf(0f) }  // 0 to 12 seconds
     
-    // Enhancement
-    var clarity by remember { mutableFloatStateOf(0f) }
-    var spectrumExtension by remember { mutableFloatStateOf(0f) }
-    var tubeAmp by remember { mutableFloatStateOf(0f) }
-    var trebleBoost by remember { mutableFloatStateOf(0f) }
+    // Enhancement - load from preferences
+    var clarity by remember { mutableFloatStateOf(audioPreferences?.getClarity() ?: 0f) }
+    var spectrumExtension by remember { mutableFloatStateOf(audioPreferences?.getSpectrumExtension() ?: 0f) }
+    var tubeAmp by remember { mutableFloatStateOf(audioPreferences?.getTubeAmp() ?: 0f) }
+    var trebleBoost by remember { mutableFloatStateOf(audioPreferences?.getTrebleBoost() ?: 0f) }
     
     // Section expansion states
     var expandedSections by remember { 
         mutableStateOf(setOf("equalizer", "effects"))
+    }
+    
+    // Apply saved settings to audio engine on first composition
+    LaunchedEffect(Unit) {
+        // Apply EQ bands to engine
+        bands.forEachIndexed { index, band ->
+            audioEngine?.setEqualizerBand(index, band.level * 12f)
+        }
+        // Apply other effects
+        audioEngine?.setBassBoost(bassBoost)
+        audioEngine?.setVirtualizer(virtualizer)
+        audioEngine?.setStereoBalance(stereoBalance)
+        audioEngine?.setChannelSeparation(channelSeparation)
+        audioEngine?.setSurroundLevel(surroundLevel)
+        audioEngine?.setRoomSize(roomSize)
+        audioEngine?.setSurround3D(effect3d)
+        audioEngine?.setHeadphoneType(headphoneType.ordinal)
+        audioEngine?.setHeadphoneSurround(headphoneSurround)
+        audioEngine?.setCompressor(compressor)
+        audioEngine?.setVolumeLeveler(volumeLeveler)
+        audioEngine?.setLimiter(0.99f - (limiter * 0.49f))
+        audioEngine?.setClarity(clarity)
+        audioEngine?.setSpectrumExtension(spectrumExtension)
+        audioEngine?.setTubeWarmth(tubeAmp)
+        audioEngine?.setTrebleBoost(trebleBoost)
+        if (reverbPreset != ReverbPreset.NONE) {
+            audioEngine?.setReverb(reverbPreset.ordinal, 0.5f)
+        }
     }
     
     fun toggleSection(section: String) {
@@ -141,10 +164,12 @@ fun EqualizerScreen(
     
     fun applyPreset(preset: String) {
         selectedPreset = preset
+        audioPreferences?.setSelectedPreset(preset)
         val config = presetConfigs[preset] ?: return
         bands = bands.mapIndexed { index, band ->
             val newLevel = config.getOrElse(index) { 0f }
-            // Send to native engine: convert -1..1 to dB (-12 to +12)
+            // Save to preferences and apply to engine
+            audioPreferences?.setBandLevel(index, newLevel)
             audioEngine?.setEqualizerBand(index, newLevel * 12f)
             band.copy(level = newLevel)
         }
@@ -152,69 +177,72 @@ fun EqualizerScreen(
     
     fun applyProfile(profile: EffectProfile) {
         selectedProfile = profile
+        audioPreferences?.setEffectProfile(profile)
         when (profile) {
             EffectProfile.CUSTOM -> { /* User controls everything manually */ }
             EffectProfile.MUSIC -> {
                 applyPreset("Pop")
-                bassBoost = 0.3f; audioEngine?.setBassBoost(0.3f)
-                virtualizer = 0.4f; audioEngine?.setVirtualizer(0.4f)
-                clarity = 0.3f; audioEngine?.setClarity(0.3f)
+                bassBoost = 0.3f; audioPreferences?.setBassBoost(0.3f); audioEngine?.setBassBoost(0.3f)
+                virtualizer = 0.4f; audioPreferences?.setVirtualizer(0.4f); audioEngine?.setVirtualizer(0.4f)
+                clarity = 0.3f; audioPreferences?.setClarity(0.3f); audioEngine?.setClarity(0.3f)
             }
             EffectProfile.MOVIE -> {
                 applyPreset("Flat")
-                effect3d = 0.6f; audioEngine?.setSurround3D(0.6f)
-                roomSize = 0.7f; audioEngine?.setRoomSize(0.7f)
-                bassBoost = 0.5f; audioEngine?.setBassBoost(0.5f)
+                effect3d = 0.6f; audioPreferences?.set3DEffect(0.6f); audioEngine?.setSurround3D(0.6f)
+                roomSize = 0.7f; audioPreferences?.setRoomSize(0.7f); audioEngine?.setRoomSize(0.7f)
+                bassBoost = 0.5f; audioPreferences?.setBassBoost(0.5f); audioEngine?.setBassBoost(0.5f)
             }
             EffectProfile.GAME -> {
                 applyPreset("Flat")
-                effect3d = 0.8f; audioEngine?.setSurround3D(0.8f)
-                clarity = 0.5f; audioEngine?.setClarity(0.5f)
-                bassBoost = 0.6f; audioEngine?.setBassBoost(0.6f)
+                effect3d = 0.8f; audioPreferences?.set3DEffect(0.8f); audioEngine?.setSurround3D(0.8f)
+                clarity = 0.5f; audioPreferences?.setClarity(0.5f); audioEngine?.setClarity(0.5f)
+                bassBoost = 0.6f; audioPreferences?.setBassBoost(0.6f); audioEngine?.setBassBoost(0.6f)
             }
             EffectProfile.PODCAST -> {
                 applyPreset("Vocal")
-                clarity = 0.7f; audioEngine?.setClarity(0.7f)
-                volumeLeveler = 0.6f; audioEngine?.setVolumeLeveler(0.6f)
-                compressor = 0.4f; audioEngine?.setCompressor(0.4f)
+                clarity = 0.7f; audioPreferences?.setClarity(0.7f); audioEngine?.setClarity(0.7f)
+                volumeLeveler = 0.6f; audioPreferences?.setVolumeLeveler(0.6f); audioEngine?.setVolumeLeveler(0.6f)
+                compressor = 0.4f; audioPreferences?.setCompressor(0.4f); audioEngine?.setCompressor(0.4f)
             }
             EffectProfile.HIFI -> {
                 applyPreset("Flat")
-                tubeAmp = 0.2f; audioEngine?.setTubeWarmth(0.2f)
-                spectrumExtension = 0.3f; audioEngine?.setSpectrumExtension(0.3f)
+                tubeAmp = 0.2f; audioPreferences?.setTubeAmp(0.2f); audioEngine?.setTubeWarmth(0.2f)
+                spectrumExtension = 0.3f; audioPreferences?.setSpectrumExtension(0.3f); audioEngine?.setSpectrumExtension(0.3f)
             }
         }
     }
     
     fun resetAll() {
         applyPreset("Flat")
-        bassBoost = 0f; audioEngine?.setBassBoost(0f)
-        virtualizer = 0f; audioEngine?.setVirtualizer(0f)
-        reverbPreset = ReverbPreset.NONE
-        loudnessGain = 0f
-        stereoBalance = 0f; audioEngine?.setStereoBalance(0f)
-        channelSeparation = 0.5f; audioEngine?.setChannelSeparation(0.5f)
-        surroundMode = SurroundMode.OFF
-        surroundLevel = 0.5f
-        roomSize = 0.5f; audioEngine?.setRoomSize(0.5f)
-        effect3d = 0f; audioEngine?.setSurround3D(0f)
-        headphoneType = HeadphoneType.GENERIC
-        headphoneSurround = false
-        compressor = 0f; audioEngine?.setCompressor(0f)
-        volumeLeveler = 0f; audioEngine?.setVolumeLeveler(0f)
-        limiter = 0f; audioEngine?.setLimiter(0.99f)
-        dynamicRange = 1f
-        clarity = 0f; audioEngine?.setClarity(0f)
-        spectrumExtension = 0f; audioEngine?.setSpectrumExtension(0f)
-        tubeAmp = 0f; audioEngine?.setTubeWarmth(0f)
-        trebleBoost = 0f; audioEngine?.setTrebleBoost(0f)
-        selectedProfile = EffectProfile.CUSTOM
+        bassBoost = 0f; audioPreferences?.setBassBoost(0f); audioEngine?.setBassBoost(0f)
+        virtualizer = 0f; audioPreferences?.setVirtualizer(0f); audioEngine?.setVirtualizer(0f)
+        reverbPreset = ReverbPreset.NONE; audioPreferences?.setReverbPreset(ReverbPreset.NONE)
+        loudnessGain = 0f; audioPreferences?.setLoudnessGain(0f)
+        stereoBalance = 0f; audioPreferences?.setStereoBalance(0f); audioEngine?.setStereoBalance(0f)
+        channelSeparation = 0.5f; audioPreferences?.setChannelSeparation(0.5f); audioEngine?.setChannelSeparation(0.5f)
+        surroundMode = SurroundMode.OFF; audioPreferences?.setSurroundMode(SurroundMode.OFF)
+        surroundLevel = 0.5f; audioPreferences?.setSurroundLevel(0.5f)
+        roomSize = 0.5f; audioPreferences?.setRoomSize(0.5f); audioEngine?.setRoomSize(0.5f)
+        effect3d = 0f; audioPreferences?.set3DEffect(0f); audioEngine?.setSurround3D(0f)
+        headphoneType = HeadphoneType.GENERIC; audioPreferences?.setHeadphoneType(HeadphoneType.GENERIC)
+        headphoneSurround = false; audioPreferences?.setHeadphoneSurround(false)
+        compressor = 0f; audioPreferences?.setCompressor(0f); audioEngine?.setCompressor(0f)
+        volumeLeveler = 0f; audioPreferences?.setVolumeLeveler(0f); audioEngine?.setVolumeLeveler(0f)
+        limiter = 0f; audioPreferences?.setLimiter(0f); audioEngine?.setLimiter(0.99f)
+        dynamicRange = 1f; audioPreferences?.setDynamicRange(1f)
+        clarity = 0f; audioPreferences?.setClarity(0f); audioEngine?.setClarity(0f)
+        spectrumExtension = 0f; audioPreferences?.setSpectrumExtension(0f); audioEngine?.setSpectrumExtension(0f)
+        tubeAmp = 0f; audioPreferences?.setTubeAmp(0f); audioEngine?.setTubeWarmth(0f)
+        trebleBoost = 0f; audioPreferences?.setTrebleBoost(0f); audioEngine?.setTrebleBoost(0f)
+        selectedProfile = EffectProfile.CUSTOM; audioPreferences?.setEffectProfile(EffectProfile.CUSTOM)
         audioEffectsManager?.resetAll()
     }
     
     LaunchedEffect(isEnabled) {
+        audioPreferences?.setEqEnabled(isEnabled)
         audioEffectsManager?.setEnabled(isEnabled)
     }
+
     
     val scrollState = rememberScrollState()
     
@@ -420,7 +448,9 @@ fun EqualizerScreen(
                                             this[index] = band.copy(level = coercedLevel)
                                         }
                                         selectedPreset = "Custom"
-                                        // Send to native engine: convert -1..1 to dB (-12 to +12)
+                                        audioPreferences?.setSelectedPreset("Custom")
+                                        // Save to preferences and apply to engine
+                                        audioPreferences?.setBandLevel(index, coercedLevel)
                                         audioEngine?.setEqualizerBand(index, coercedLevel * 12f)
                                     }
                                 )
@@ -445,6 +475,7 @@ fun EqualizerScreen(
                     value = bassBoost,
                     onValueChange = { 
                         bassBoost = it
+                        audioPreferences?.setBassBoost(it)
                         audioEffectsManager?.setBassBoostLevel(it)
                         audioEngine?.setBassBoost(it)
                     },
@@ -457,6 +488,7 @@ fun EqualizerScreen(
                     value = virtualizer,
                     onValueChange = { 
                         virtualizer = it
+                        audioPreferences?.setVirtualizer(it)
                         audioEffectsManager?.setVirtualizerLevel(it)
                         audioEngine?.setVirtualizer(it)
                     },
@@ -469,6 +501,7 @@ fun EqualizerScreen(
                     value = loudnessGain,
                     onValueChange = { 
                         loudnessGain = it
+                        audioPreferences?.setLoudnessGain(it)
                         audioEffectsManager?.setLoudnessGain(it)
                     },
                     enabled = isEnabled,
@@ -501,7 +534,10 @@ fun EqualizerScreen(
                     SurroundMode.entries.forEach { mode ->
                         FilterChip(
                             selected = surroundMode == mode,
-                            onClick = { surroundMode = mode },
+                            onClick = { 
+                                surroundMode = mode
+                                audioPreferences?.setSurroundMode(mode)
+                            },
                             label = { Text(mode.displayName, style = MaterialTheme.typography.labelSmall) },
                             modifier = Modifier.weight(1f),
                             enabled = isEnabled
@@ -516,6 +552,7 @@ fun EqualizerScreen(
                     value = effect3d,
                     onValueChange = { 
                         effect3d = it
+                        audioPreferences?.set3DEffect(it)
                         audioEngine?.setSurround3D(it)
                     },
                     enabled = isEnabled && surroundMode != SurroundMode.OFF,
@@ -527,6 +564,7 @@ fun EqualizerScreen(
                     value = roomSize,
                     onValueChange = { 
                         roomSize = it
+                        audioPreferences?.setRoomSize(it)
                         audioEngine?.setRoomSize(it)
                     },
                     enabled = isEnabled && surroundMode != SurroundMode.OFF,
@@ -538,6 +576,7 @@ fun EqualizerScreen(
                     value = surroundLevel,
                     onValueChange = { 
                         surroundLevel = it
+                        audioPreferences?.setSurroundLevel(it)
                         audioEngine?.setSurroundLevel(it)
                     },
                     enabled = isEnabled && surroundMode != SurroundMode.OFF,
@@ -571,6 +610,7 @@ fun EqualizerScreen(
                             selected = headphoneType == type,
                             onClick = { 
                                 headphoneType = type
+                                audioPreferences?.setHeadphoneType(type)
                                 audioEngine?.setHeadphoneType(type.ordinal)
                             },
                             label = { Text(type.displayName, style = MaterialTheme.typography.labelSmall, maxLines = 1) },
@@ -591,6 +631,7 @@ fun EqualizerScreen(
                             selected = headphoneType == type,
                             onClick = { 
                                 headphoneType = type
+                                audioPreferences?.setHeadphoneType(type)
                                 audioEngine?.setHeadphoneType(type.ordinal)
                             },
                             label = { Text(type.displayName, style = MaterialTheme.typography.labelSmall) },
@@ -622,6 +663,7 @@ fun EqualizerScreen(
                         checked = headphoneSurround,
                         onCheckedChange = { 
                             headphoneSurround = it
+                            audioPreferences?.setHeadphoneSurround(it)
                             audioEngine?.setHeadphoneSurround(it)
                         },
                         enabled = isEnabled
@@ -644,6 +686,7 @@ fun EqualizerScreen(
                     value = compressor,
                     onValueChange = { 
                         compressor = it
+                        audioPreferences?.setCompressor(it)
                         audioEngine?.setCompressor(it)
                     },
                     enabled = isEnabled,
@@ -656,6 +699,7 @@ fun EqualizerScreen(
                     value = volumeLeveler,
                     onValueChange = { 
                         volumeLeveler = it
+                        audioPreferences?.setVolumeLeveler(it)
                         audioEngine?.setVolumeLeveler(it)
                     },
                     enabled = isEnabled,
@@ -668,6 +712,7 @@ fun EqualizerScreen(
                     value = limiter,
                     onValueChange = { 
                         limiter = it
+                        audioPreferences?.setLimiter(it)
                         // Limiter ceiling: 0.5 to 0.99 (lower value = more limiting)
                         audioEngine?.setLimiter(0.99f - (it * 0.49f))
                     },
@@ -679,7 +724,10 @@ fun EqualizerScreen(
                 EffectSlider(
                     label = "Dynamic Range",
                     value = dynamicRange,
-                    onValueChange = { dynamicRange = it },
+                    onValueChange = { 
+                        dynamicRange = it
+                        audioPreferences?.setDynamicRange(it)
+                    },
                     enabled = isEnabled,
                     icon = Icons.Default.SwapVert,
                     valueLabel = "${(dynamicRange * 100).toInt()}%"
@@ -701,6 +749,7 @@ fun EqualizerScreen(
                     value = clarity,
                     onValueChange = { 
                         clarity = it
+                        audioPreferences?.setClarity(it)
                         audioEngine?.setClarity(it)
                     },
                     enabled = isEnabled,
@@ -713,6 +762,7 @@ fun EqualizerScreen(
                     value = spectrumExtension,
                     onValueChange = { 
                         spectrumExtension = it
+                        audioPreferences?.setSpectrumExtension(it)
                         audioEngine?.setSpectrumExtension(it)
                     },
                     enabled = isEnabled,
@@ -725,6 +775,7 @@ fun EqualizerScreen(
                     value = tubeAmp,
                     onValueChange = { 
                         tubeAmp = it
+                        audioPreferences?.setTubeAmp(it)
                         audioEngine?.setTubeWarmth(it)
                     },
                     enabled = isEnabled,
@@ -737,6 +788,7 @@ fun EqualizerScreen(
                     value = trebleBoost,
                     onValueChange = { 
                         trebleBoost = it
+                        audioPreferences?.setTrebleBoost(it)
                         audioEngine?.setTrebleBoost(it)
                     },
                     enabled = isEnabled,
@@ -764,6 +816,7 @@ fun EqualizerScreen(
                                 selected = reverbPreset == preset,
                                 onClick = {
                                     reverbPreset = preset
+                                    audioPreferences?.setReverbPreset(preset)
                                     // Native engine preset: 0=None, 1=SmallRoom, 2=MediumRoom, 3=LargeRoom, 4=MediumHall, 5=LargeHall, 6=Plate
                                     audioEngine?.setReverb(preset.ordinal, 0.5f)
                                 },
@@ -785,6 +838,7 @@ fun EqualizerScreen(
                                 selected = reverbPreset == preset,
                                 onClick = {
                                     reverbPreset = preset
+                                    audioPreferences?.setReverbPreset(preset)
                                     audioEngine?.setReverb(preset.ordinal, 0.5f)
                                 },
                                 label = { Text(preset.displayName, style = MaterialTheme.typography.labelSmall) },
