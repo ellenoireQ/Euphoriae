@@ -43,8 +43,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/release-keystore.jks
+          echo "Keystore decoded successfully"
+
       - name: Build Release APK
         run: ./gradlew assembleRelease --no-daemon
+        env:
+          SIGNING_KEYSTORE_PATH: ${{ github.workspace }}/release-keystore.jks
+          SIGNING_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Get APK path
         id: apk-path
@@ -106,8 +116,8 @@ jobs:
       - name: Read Changelog
         id: changelog
         run: |
-          if [ -f "CHANGELOGS.MD" ]; then
-            CHANGELOG=$(cat CHANGELOGS.MD)
+          if [ -f "latest.md" ]; then
+            CHANGELOG=$(cat latest.md)
             echo "changelog<<EOF" >> $GITHUB_OUTPUT
             echo "$CHANGELOG" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
@@ -121,10 +131,6 @@ jobs:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: Euphoriae ${{ steps.tag.outputs.tag }}
           body: |
-            ## Euphoriae ${{ steps.tag.outputs.tag }}
-            
-            ### Download
-            Download the APK file below to install on your Android device.
             
             ### What's Changed
             ${{ steps.changelog.outputs.changelog }}
