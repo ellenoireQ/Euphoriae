@@ -855,7 +855,7 @@ fun EqualizerScreen(
             
             // ================== PLAYBACK CONTROL SECTION ==================
             ExpandableSection(
-                title = "Playback Control",
+                title = "Playback Control (Beta)",
                 subtitle = "Tempo & Pitch",
                 icon = Icons.Default.Speed,
                 isExpanded = "playback" in expandedSections,
