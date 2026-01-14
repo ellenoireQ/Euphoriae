@@ -162,18 +162,10 @@ fun EuphoriaeTheme(
         ThemeColorOption.RED -> if (darkTheme) RedDarkColorScheme else RedLightColorScheme
     }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        MaterialExpressiveTheme(
-            colorScheme = colorScheme,
-            motionScheme = MotionScheme.expressive(),
-            typography = Typography,
-            content = content
-        )
-    } else {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = Typography,
-            content = content
-        )
-    }
+    MaterialExpressiveTheme(
+        colorScheme = colorScheme,
+        motionScheme = MotionScheme.expressive(),
+        typography = Typography,
+        content = content
+    )
 }
