@@ -10,6 +10,7 @@ import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -91,11 +92,61 @@ class MusicPlaybackService : MediaSessionService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         
-        mediaSession = MediaSession.Builder(this, player!!)
+        mediaSession = MediaSession.Builder(this, createForwardingPlayer(player!!))
             .setSessionActivity(pendingIntent)
             .build()
         
         Log.d(TAG, "MusicPlaybackService created with native audio processing pipeline")
+    }
+    
+    private fun createForwardingPlayer(exoPlayer: ExoPlayer): ForwardingPlayer {
+        return object : ForwardingPlayer(exoPlayer) {
+            override fun getAvailableCommands(): Player.Commands {
+                return super.getAvailableCommands().buildUpon()
+                    .add(Player.COMMAND_SEEK_TO_NEXT)
+                    .add(Player.COMMAND_SEEK_TO_PREVIOUS)
+                    .add(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+                    .add(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
+                    .build()
+            }
+            
+            override fun isCommandAvailable(command: Int): Boolean {
+                return when (command) {
+                    Player.COMMAND_SEEK_TO_NEXT,
+                    Player.COMMAND_SEEK_TO_PREVIOUS,
+                    Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM,
+                    Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM -> true
+                    else -> super.isCommandAvailable(command)
+                }
+            }
+            
+            override fun seekToNext() {
+                serviceScope.launch {
+                    playNextFromQueue()
+                }
+            }
+            
+            override fun seekToPrevious() {
+                serviceScope.launch {
+                    playPreviousFromQueue()
+                }
+            }
+            
+            override fun seekToNextMediaItem() {
+                serviceScope.launch {
+                    playNextFromQueue()
+                }
+            }
+            
+            override fun seekToPreviousMediaItem() {
+                serviceScope.launch {
+                    playPreviousFromQueue()
+                }
+            }
+            
+            override fun hasNextMediaItem(): Boolean = true
+            override fun hasPreviousMediaItem(): Boolean = true
+        }
     }
     
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
