@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Euphoriae
+ * Copyright 2026 Euphoriae
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -824,5 +824,6 @@ void AudioEngine::applyReverb(float* buffer, int32_t numFrames, int32_t channelC
         }
     }
 }
+
 
 } // namespace euphoriae

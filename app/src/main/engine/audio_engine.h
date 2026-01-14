@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Euphoriae
+ * Copyright 2026 Euphoriae
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,5 +207,6 @@ private:
 };
 
 } // namespace euphoriae
+
 
 #endif // EUPHORIAE_AUDIO_ENGINE_H

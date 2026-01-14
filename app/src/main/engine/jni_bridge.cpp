@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Euphoriae
+ * Copyright 2026 Euphoriae
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -234,3 +234,4 @@ Java_com_oss_euphoriae_engine_AudioEngine_nativeGetPitch(JNIEnv *env, jobject th
 }
 
 } // extern "C"
+
