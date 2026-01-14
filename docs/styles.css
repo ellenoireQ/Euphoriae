@@ -54,7 +54,7 @@
     font-display: swap;
 }
 
-/* ===== CSS Variables - Material Design 3 Expressive (Material You Green) ===== */
+/* ===== Material 3 Green color theme ===== */
 :root {
     /* Primary Colors - Sage/Lime Green Material You Theme */
     --md-primary: #9CB686;
@@ -137,7 +137,6 @@
     --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ===== Reset & Base ===== */
 *,
 *::before,
 *::after {
@@ -187,6 +186,7 @@ button {
 }
 
 /* ===== Particles Background ===== */
+/* Showing dot particles floating in the background */
 .particles {
     position: fixed;
     top: 0;
