@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.2"
+agp = "9.0.0"
 datastorePreferences = "1.2.0"
 glanceAppwidget = "1.1.1"
 glanceMaterial3 = "1.1.1"
