@@ -1,6 +1,4 @@
 # Euphoriae
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FellenoireQ%2FEuphoriae.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FellenoireQ%2FEuphoriae?ref=badge_shield)
-
 
 <p align="center">
   <img src="logo/logo.png" width="120" alt="Euphoriae Logo"/>
@@ -153,6 +151,7 @@ Contributions are welcome! Feel free to:
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
 
 
 ---
